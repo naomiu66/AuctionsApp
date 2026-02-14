@@ -10,7 +10,7 @@ export class TelegramResolver implements I18nResolver {
 
     const userLang = ctx.from?.language_code;
     if (userLang) {
-      return [userLang, 'en'];
+      return [userLang];
     }
     return ['en'];
   }
