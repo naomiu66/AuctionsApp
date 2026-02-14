@@ -1,17 +1,22 @@
-import { Injectable } from "@nestjs/common";
-import { Command, Start, Update } from "nestjs-telegraf";
-import { Context } from "telegraf";
+import { Injectable, Logger } from '@nestjs/common';
+import { Command, Ctx, Start, Update } from 'nestjs-telegraf';
+import { Context } from 'telegraf';
+import { TelegramService } from './telegram.service';
+import { I18n, I18nContext } from 'nestjs-i18n';
 
 @Update()
 @Injectable()
 export class TelegramUpdate {
-    @Start()
-    async onStart(ctx: Context) {
-        await ctx.reply('Hello world!');
-    }
+  private readonly logger = new Logger(TelegramUpdate.name);
 
-    @Command('help')
-    async onHelp(ctx: Context) {
-        await ctx.reply('Help message yo');
-    }
+  constructor(private telegramService: TelegramService) {}
+  @Start()
+  async onStart(@Ctx() ctx: Context, @I18n() i18n: I18nContext) {
+    await this.telegramService.startCommand(ctx, i18n);
+  }
+
+  @Command('help')
+  async onHelp(@Ctx() ctx: Context, @I18n() i18n: I18nContext) {
+    await this.telegramService.helpCommand(ctx, i18n);
+  }
 }
