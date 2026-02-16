@@ -15,4 +15,22 @@ export class TelegramService {
     const reply = i18n.t('telegram.help');
     await ctx.reply(reply);
   }
+
+  async balanceCommand() {}
+
+  async depositCommand() {}
+
+  async withdrawCommand() {}
+
+  // only for admin
+  async lockBalanceCommand() {}
+
+  // only for admin
+  async unlockBalanceCommand() {}
+
+  async createAuctionCommand() {}
+
+  async bidCommand() {}
+
+  async endAuctionCommand() {}
 }

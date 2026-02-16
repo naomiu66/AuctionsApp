@@ -35,4 +35,46 @@ export class RedisService implements OnModuleDestroy {
   getClient(): RedisClientType {
     return this.client;
   }
+
+  async set<T>(key: string, value: T, ttlSeconds?: number) {
+    try {
+      if (ttlSeconds) {
+        await this.client.set(key, JSON.stringify(value), {
+          expiration: { type: 'EX', value: ttlSeconds },
+        });
+      } else {
+        const ttl = this.configService.get<number>('REDIS_DEFAULT_TTL_SECONDS');
+        if (!ttl)
+          throw new Error('REDIS_DEFAULT_TTL_SECONDS is not set in config');
+        await this.client.set(key, JSON.stringify(value), {
+          expiration: { type: 'EX', value: ttl },
+        });
+      }
+    } catch (err: Error | any) {
+      this.logger.error(`Failed to set key ${key} in redis`, err.message);
+      // throw err;
+    }
+  }
+
+  async get<T>(key: string): Promise<T | null | undefined> {
+    try {
+      const value = await this.client.get(key);
+      return value ? JSON.parse(value) : null;
+    } catch (err: Error | any) {
+      this.logger.error(`Failed to get key ${key} from redis`, err.message);
+      // throw err;
+    }
+  }
+
+  async invalidate(key: string) {
+    try {
+      await this.client.del(key);
+    } catch (error: Error | any) {
+      this.logger.error(
+        `Failed to invalidate key ${key} in redis`,
+        error.message,
+      );
+      // throw error;
+    }
+  }
 }
